@@ -23,65 +23,73 @@
   </head>
   <body style="margin: 0px; overflow: hidden">
     <a-scene embedded arjs="trackingMethod: best; sourceType: webcam">
-      <a-assets>
-        <a-asset-item
-          id="eiffel_tower"
-          src="./Assets/3DModels/eiffel_tower/scene.gltf"
-        ></a-asset-item>
+      <a-assets id="a-assets"> </a-assets>
 
-        <audio
-          id="eiffel_tower_audio"
-          src="./Assets/Sounds/France/Fr_Eiffel_Tower.mp3"
-          preload="auto"
-        ></audio>
-      </a-assets>
+      <a-entity id="ar-markers"></a-entity>
 
-      <a-marker type="pattern" url="./Marker/pattern-whitepuppy.patt">
-        <a-gltf-model
-          src="#eiffel_tower"
-          position="0 0 0"
-          scale="0.5 0.5 0.5"
-          rotation="0 0 0"
-        ></a-gltf-model>
-
-        <a-text
-          value="FRANCE"
-          position="0 1.5 0"
-          color="#333"
-          align="center"
-        ></a-text>
-      </a-marker>
       <a-entity camera></a-entity>
     </a-scene>
+
     <button id="pronounce_button">發音</button>
 
     <script>
-      // 等待網頁加載
-      window.onload = function () {
-        // 取得 3D 模型物件
-        const pronounce_button = document.querySelector("#pronounce_button");
-        // 取得發音資訊
-        const audio = document.querySelector("#eiffel_tower_audio");
+      document.addEventListener("DOMContentLoaded", async () => {
+        const arMarkersContainer = document.querySelector("#ar-markers");
+        const aAssets = document.querySelector("#a-assets");
+        const pronounceButton = document.querySelector("#pronounce_button");
+        let currentAudio = null;
 
-        //監聽點擊事件
-        pronounce_button.addEventListener("click", function () {
-          audio.load();
+        const response = await fetch("./data.json");
+        const cardData = await response.json();
 
-          //播放音訊
-          const playpromise = audio.play();
+        cardData.forEach(async (card) => {
+          const audioEl = document.createElement("audio");
+          audioEl.setAttribute("id", `audio-${card.cardId}`);
+          audioEl.setAttribute("src", card.audioPath);
+          audioEl.setAttribute("preload", "auto");
+          aAssets.appendChild(audioEl);
 
-          if (playpromise !== undefined) {
-            playPromise
-              .then((_) => {
-                console.log("音訊播放成功！");
-              })
-              .catch((error) => {
-                console.log("音訊播放失敗！", error);
-                alert("請允許瀏覽器播放音訊");
-              });
+          const markerEl = document.createElement("a-marker");
+          markerEl.setAttribute("type", "pattern");
+          markerEl.setAttribute("url", `./Marker/pattern-${card.cardId}.patt`);
+
+          const modelEl = document.createElement("a-gltf-model");
+          modelEl.setAttribute("id", `model-${card.cardId}`);
+          modelEl.setAttribute("src", card.modelPath);
+          modelEl.setAttribute("position", "0 0 0");
+          modelEl.setAttribute("scale", card.scale);
+          modelEl.setAttribute("rotation", "0 0 0");
+
+          const textEl = document.createElement("a-text");
+          textEl.setAttribute("value", card.countryName);
+          textEl.setAttribute("position", "0 1.5 0");
+          textEl.setAttribute("color", "#333");
+          textEl.setAttribute("align", "center");
+
+          markerEl.appendChild(modelEl);
+          markerEl.appendChild(textEl);
+          arMarkersContainer.appendChild(markerEl);
+
+          markerEl.addEventListener("markerFound", () => {
+            currentAudio = document.querySelector(`#audio-${card.cardId}`);
+          });
+
+          markerEl.addEventListener("markerLost", () => {
+            if (currentAudio) {
+              currentAudio.pause();
+              currentAudio.currentTime = 0;
+              currentAudio = null;
+            }
+          });
+        });
+
+        pronounceButton.addEventListener("click", () => {
+          if (currentAudio) {
+            currentAudio.load();
+            currentAudio.play();
           }
         });
-      };
+      });
     </script>
   </body>
 </html>

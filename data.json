@@ -1,0 +1,9 @@
+[
+  {
+    "cardId": "whitepuppy",
+    "countryName": "FRANCE",
+    "modelPath": "./Assets/3DModels/eiffel_tower/scene.gltf",
+    "audioPath": "./Assets/Sounds/France/Fr_Eiffel_Tower.mp3",
+    "scale": "0.5 0.5 0.5"
+  }
+]
