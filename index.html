@@ -10,8 +10,13 @@
       <a-assets>
         <a-asset-item
           id="eiffel_tower"
-          src="./Assets/eiffel_tower/scene.gltf"
+          src="./Assets/3DModels/eiffel_tower/scene.gltf"
         ></a-asset-item>
+
+        <audio
+          id="eiffel_tower_audio"
+          src="./Assets/Sound/France/Fr_Eiffel_Tower.mp3"
+        ></audio>
       </a-assets>
 
       <a-marker type="pattern" url="./pattern-whitepuppy.patt">
@@ -31,5 +36,20 @@
       </a-marker>
       <a-entity camera></a-entity>
     </a-scene>
+
+    <script>
+      // 等待網頁加載
+      window.onload = function () {
+        // 取得 3D 模型物件
+        const model = document.querySelector("#eiffel_tower");
+        // 取得發音資訊
+        const audio = document.querySelector("#eiffel_tower_audio");
+
+        //監聽點擊事件
+        model.addEventListener("click", function () {
+          audio.play();
+        });
+      };
+    </script>
   </body>
 </html>
