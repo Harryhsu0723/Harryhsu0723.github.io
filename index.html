@@ -2,6 +2,22 @@
 <html>
   <head>
     <title>我的第一個 WebAR</title>
+    <style>
+      #pronounce_button {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+        padding: 10px 20px;
+        font-size: 18px;
+        border: none;
+        border-radius: 5px;
+        background-color: #007bff;
+        color: white;
+        cursor: pointer;
+      }
+    </style>
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
   </head>
@@ -15,11 +31,12 @@
 
         <audio
           id="eiffel_tower_audio"
-          src="./Assets/Sound/France/Fr_Eiffel_Tower.mp3"
+          src="./Assets/Sounds/France/Fr_Eiffel_Tower.mp3"
+          preload="auto"
         ></audio>
       </a-assets>
 
-      <a-marker type="pattern" url="./pattern-whitepuppy.patt">
+      <a-marker type="pattern" url="./Marker/pattern-whitepuppy.patt">
         <a-gltf-model
           src="#eiffel_tower"
           position="0 0 0"
@@ -36,18 +53,33 @@
       </a-marker>
       <a-entity camera></a-entity>
     </a-scene>
+    <button id="pronounce_button">發音</button>
 
     <script>
       // 等待網頁加載
       window.onload = function () {
         // 取得 3D 模型物件
-        const model = document.querySelector("#eiffel_tower");
+        const pronounce_button = document.querySelector("#pronounce_button");
         // 取得發音資訊
         const audio = document.querySelector("#eiffel_tower_audio");
 
         //監聽點擊事件
-        model.addEventListener("click", function () {
-          audio.play();
+        pronounce_button.addEventListener("click", function () {
+          audio.load();
+
+          //播放音訊
+          const playpromise = audio.play();
+
+          if (playpromise !== undefined) {
+            playPromise
+              .then((_) => {
+                console.log("音訊播放成功！");
+              })
+              .catch((error) => {
+                console.log("音訊播放失敗！", error);
+                alert("請允許瀏覽器播放音訊");
+              });
+          }
         });
       };
     </script>
